@@ -1,0 +1,300 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet" />
+    <script type="importmap">
+      {
+        "imports": {
+          "firebase/app": "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js",
+          "firebase/auth": "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js"
+        }
+      }
+    </script>
+    <style>
+      *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+      :root {
+        --bg: #0a0a0f;
+        --surface: #12121a;
+        --border: #2a2a3a;
+        --accent: #aaff00;
+        --accent-dim: rgba(170,255,0,0.12);
+        --text: #e8e8f0;
+        --muted: #6a6a80;
+        --input-bg: #0e0e16;
+        --radius: 10px;
+      }
+
+      body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: 'Syne', sans-serif;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+      }
+
+      body::before {
+        content: '';
+        position: fixed;
+        inset: 0;
+        background-image:
+          linear-gradient(rgba(170,255,0,0.03) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(170,255,0,0.03) 1px, transparent 1px);
+        background-size: 48px 48px;
+        pointer-events: none;
+        z-index: 0;
+      }
+
+      /* Glow orb */
+      body::after {
+        content: '';
+        position: fixed;
+        top: -20%;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 600px;
+        height: 600px;
+        background: radial-gradient(circle, rgba(170,255,0,0.07) 0%, transparent 70%);
+        pointer-events: none;
+        z-index: 0;
+      }
+
+      .card {
+        position: relative;
+        z-index: 1;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 18px;
+        padding: 44px 40px;
+        width: 100%;
+        max-width: 420px;
+        box-shadow: 0 0 0 1px rgba(170,255,0,0.04), 0 32px 80px rgba(0,0,0,0.6);
+        animation: fadeUp 0.5s cubic-bezier(0.22,1,0.36,1) both;
+      }
+
+      @keyframes fadeUp {
+        from { opacity: 0; transform: translateY(24px); }
+        to   { opacity: 1; transform: translateY(0); }
+      }
+
+      .card-header {
+        margin-bottom: 32px;
+        text-align: center;
+      }
+
+      .card-header h1 {
+        font-size: 1.8rem;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        color: var(--text);
+      }
+
+      .card-header p {
+        font-family: 'DM Mono', monospace;
+        font-size: 0.72rem;
+        color: var(--muted);
+        margin-top: 6px;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+      }
+
+      /* Google button */
+      #loginBtn {
+        width: 100%;
+        height: 48px;
+        background: var(--accent-dim);
+        border: 1px solid rgba(170,255,0,0.3);
+        border-radius: var(--radius);
+        color: var(--accent);
+        font-family: 'Syne', sans-serif;
+        font-size: 0.88rem;
+        font-weight: 600;
+        letter-spacing: 0.04em;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        margin: 0 0 28px 0;
+        transition: background 0.2s, box-shadow 0.2s, transform 0.15s;
+        text-transform: uppercase;
+      }
+
+      #loginBtn::before {
+        content: '';
+        width: 18px;
+        height: 18px;
+        background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Cpath fill='%23FFC107' d='M43.6 20H24v8h11.3C33.6 33.6 29.2 37 24 37c-7.2 0-13-5.8-13-13s5.8-13 13-13c3.1 0 6 1.1 8.1 3l6-6C34.6 4.1 29.6 2 24 2 11.9 2 2 11.9 2 24s9.9 22 22 22c12.7 0 21.5-8.9 21.5-21.5 0-1.2-.1-2.3-.4-3.5z'/%3E%3Cpath fill='%23FF3D00' d='M6.3 14.7l6.6 4.8C14.6 15.1 19 12 24 12c3.1 0 6 1.1 8.1 3l6-6C34.6 4.1 29.6 2 24 2 16.3 2 9.7 7.4 6.3 14.7z'/%3E%3Cpath fill='%234CAF50' d='M24 46c5.5 0 10.5-1.9 14.4-5.1l-6.7-5.5C29.6 37 26.9 38 24 38c-5.2 0-9.6-3.4-11.3-8H6.1C9.5 40.6 16.3 46 24 46z'/%3E%3Cpath fill='%231976D2' d='M43.6 20H24v8h11.3c-.9 2.4-2.4 4.4-4.3 5.9l6.7 5.5C41.3 35.9 46 30.4 46 24c0-1.4-.1-2.7-.4-4z'/%3E%3C/svg%3E") center/contain no-repeat;
+      }
+
+      #loginBtn:hover {
+        background: rgba(170,255,0,0.18);
+        box-shadow: 0 0 18px rgba(170,255,0,0.15);
+        transform: translateY(-1px);
+      }
+
+      .divider {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 28px;
+        font-family: 'DM Mono', monospace;
+        font-size: 0.7rem;
+        color: var(--muted);
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .divider::before, .divider::after {
+        content: '';
+        flex: 1;
+        height: 1px;
+        background: var(--border);
+      }
+
+      form {
+        margin-bottom: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+      }
+
+      .field {
+        display: flex;
+        flex-direction: column;
+        gap: 7px;
+      }
+
+      label {
+        font-family: 'DM Mono', monospace;
+        font-size: 0.7rem;
+        color: var(--muted);
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      input[type="email"],
+      input[type="password"] {
+        width: 100%;
+        background: var(--input-bg);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 12px 16px;
+        color: var(--text);
+        font-family: 'DM Mono', monospace;
+        font-size: 0.9rem;
+        outline: none;
+        transition: border-color 0.2s, box-shadow 0.2s;
+      }
+
+      input[type="email"]::placeholder,
+      input[type="password"]::placeholder {
+        color: var(--muted);
+        opacity: 0.6;
+      }
+
+      input[type="email"]:focus,
+      input[type="password"]:focus {
+        border-color: rgba(170,255,0,0.5);
+        box-shadow: 0 0 0 3px rgba(170,255,0,0.08);
+      }
+
+      .btn-row {
+        display: flex;
+        gap: 10px;
+        margin-top: 6px;
+      }
+
+      #signbtn, #existuser {
+        flex: 1;
+        height: 46px;
+        border-radius: var(--radius);
+        font-family: 'Syne', sans-serif;
+        font-size: 0.85rem;
+        font-weight: 600;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition: all 0.2s;
+        border: none;
+      }
+
+      #signbtn {
+        background: var(--accent);
+        color: #0a0a0f;
+      }
+
+      #signbtn:hover {
+        background: #c8ff33;
+        box-shadow: 0 0 24px rgba(170,255,0,0.35);
+        transform: translateY(-1px);
+      }
+
+      #existuser {
+        background: transparent;
+        border: 1px solid var(--border);
+        color: var(--text);
+      }
+
+      #existuser:hover {
+        border-color: var(--accent);
+        color: var(--accent);
+        background: var(--accent-dim);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <div class="card-header">
+        <h1>Welcome back</h1>
+        <p>Sign in to continue</p>
+      </div>
+
+      <button
+        id="loginBtn"
+      >
+        Sign in with Google
+      </button>
+
+      <div class="divider">or use email</div>
+
+      <form>
+        <div class="field">
+          <label for="email">Email Address</label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            placeholder="email@example.com"
+            required
+          />
+        </div>
+
+        <div class="field">
+          <label for="password">Password</label>
+          <input
+            type="password"
+            id="password"
+            name="password"
+            required
+          />
+        </div>
+
+        <div class="btn-row">
+          <button type="button" id="signbtn">Sign up</button>
+          <button type="button" id="existuser">Log in</button>
+        </div>
+      </form>
+    </div>
+
+    <script type="module" src="../dist/main.js"></script>
+  </body>
+</html>

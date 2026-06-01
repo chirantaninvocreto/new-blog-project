@@ -74,4 +74,4 @@ let signwithuser = async (auth: Auth, email: string, password: string) => {
   return token;
 };
 
-export { signwithEmail, signwithuser, Auth };
+export { signwithEmail, signwithuser };

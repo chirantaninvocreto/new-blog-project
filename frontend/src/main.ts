@@ -1,17 +1,21 @@
-import { auth, signWithgoogle } from "./firebase.js";
-import { signwithEmail, signwithuser } from "./firebase.js";
+import {
+  auth,
+  signWithgoogle,
+  signwithEmail,
+  signwithuser, //exititng user
+} from "./firebase.js";
 
 const userInfo = document.getElementById("loginBtn");
 
 userInfo?.addEventListener("click", async () => {
-  const token = await signWithgoogle();
-
+  const token = await signWithgoogle(); //in this returned token in the signwithgoogle function is retuns as token to the url route given below in fetch
+  // the generated token is sended to the requests header so the token can get decoded without adding in the body
   if (token) {
-    const response = await fetch("http://localhost:3000/posts/login", {
+    const response = await fetch("http://localhost:3000/posts/login", {//url link added in which route is of backend
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${token}`, // default format od sending the token in the header
       },
     });
   }
@@ -54,7 +58,6 @@ loginuser?.addEventListener("click", async () => {
         Authorization: `Bearer ${token}`,
       },
     });
-    console.log('user logged in')
+    console.log("user logged in");
   }
 });
-

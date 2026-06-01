@@ -1,12 +1,10 @@
-import { sequelize, QueryTypes } from "../config/database.js";
 import { Request, Response } from "../config/express.js";
+
+import { seeUserPostsService } from "../services/seeUserPostService.js";
 
 let seeUserPosts = async (req: Request, res: Response) => {
   try {
-    let query = `select * from blogs`;
-    let message = await sequelize.query(query, {
-      type: QueryTypes.SELECT,
-    });
+    let message = await seeUserPostsService();
     res.json(message);
   } catch (error) {
     console.log(error);

@@ -1,15 +1,12 @@
-import { sequelize, QueryTypes } from "../config/database.js";
 import { Request, Response } from "../config/express.js";
 
+import { editUserPostService } from "../services/editUserPostService.js";
+
 let editUserPost = async (req: Request, res: Response) => {
-  let { id } = req.params;
-  let { title, content } = req.body;
   try {
-    let query = `update blogs set title=:title,content=:content where id=:id`;
-    let message = await sequelize.query(query, {
-      replacements: { id, title, content },
-      type: QueryTypes.UPDATE,
-    });
+    let id = Number(req.params.id);
+    let { title, content } = req.body;
+    let message = await editUserPostService(title, content, id);
     res.json(message);
   } catch (error) {
     console.log(error);

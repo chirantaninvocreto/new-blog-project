@@ -11,6 +11,7 @@ let handellogin = async (req: Request, res: Response) => {
     let name: string | null = decodedToken.name ?? null;
     let email: any = decodedToken.email;
     await userLoginService(uuid, name, email);
+    
     res.json({ message: "Login successful", name, email });
   } catch (error) {
     console.log(error);

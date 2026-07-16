@@ -7,6 +7,7 @@ async function deleteUserPostService(id: number) {
     type: QueryTypes.DELETE,
   });
   return message;
+  //hello
 }
 
 export { deleteUserPostService };
